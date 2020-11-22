@@ -42,9 +42,14 @@
           </select>
         </div>
         <div class="mColor">
-          <label for="select-mColor">Text color: {{ el.mColor }}</label>
-          <input id="select-mColor" type="color" v-model="el.mColor">
-          <!-- this won't work since color options will be limited -->
+          <label for="select-mColor">Text color: </label>
+          <select id="select-mColor" v-model="el.mColor">
+            <option :key="index" v-for="(color, index) in Object.keys(colors)">{{ color }}</option>
+          </select>
+          <div :key="index" v-for="(type, index) in aveilableColorTypes(el.mColor)">
+            <input type="checkbox" :true-value="type" v-model="el.mColorType">
+            <span>{{ type }}</span>
+          </div>
         </div>
         <div class="mSize">
           <label for="select-mSize">Font size: {{ el.mSize }}</label>
@@ -101,19 +106,28 @@ export default {
     return {
       idOf: 0,
       input: '',
+      selectedColor: '',
       elements: [
         {
           id: 0,
           mText: "Hello World",
           mFont: "Roboto",
-          mColor: "#000000",
+          mColor: "melns",
+          mColorType: "",
           mSize: 32,
           rangeWeight: 40,
           rangeRotate: 0,
           mLeft: 350,
           mTop: 150,
         },
-      ]
+      ],
+      colors: {
+        balts: ['gluds', 'samts'],
+        melns: ['gluds', 'samts'],
+        sarkans: ['gluds', 'samts'],
+        sudrabs: ['gluds', 'gliters', 'spogulis'],
+        atstarojošs: []
+      }
     }
   },
 
@@ -137,12 +151,16 @@ export default {
       var r = i * 3.6
       return Math.round(r)
     },
+    aveilableColorTypes(color) {
+      return this.colors[color]
+    },
     addElement() {
       const newElement = {
         id: this.elements[this.elements.length - 1].id + 1,
         mText: "Hello World",
         mFont: "Roboto",
-        mColor: "#000000",
+        mColor: "melns",
+        mColorType: "",
         mSize: 32,
         rangeWeight: 40,
         rangeRotate: 0,
@@ -203,6 +221,7 @@ export default {
 
 .message {
   /* transform: translateX(-50%) !important; */
+  color: #000;
 }
 
 .controlls {
@@ -250,9 +269,9 @@ textarea {
 .commands {
 
 }
-
-
-
+/*  */
+/* Use tailwind */
+/*  */
 </style>
 
 
