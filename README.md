@@ -1,4 +1,4 @@
-# tshirt-editor-v2
+# sticker-editor
 
 ## Project setup
 ```
