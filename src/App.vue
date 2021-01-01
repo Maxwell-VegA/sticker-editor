@@ -12,74 +12,70 @@
         @start="idOf = el.id"
         @complete="trackLocation"
         :style="{ 
-          fontWeight: mWeight(el.rangeWeight),
+          fontWeight: el.rangeWeight,
           fontFamily: el.mFont,
           fontSize: el.mSize + 'px',
-          color: el.mColor,
-          transform: 'translateX(-50%) rotate(' + mRotate(el.rangeRotate) + 'deg)',
+          color: findColor(el.mColor),
+          transform: 'translateX(-50%) rotate(' + el.rangeRotate + 'deg)',
         }"
         >
           <span>{{ el.mText }}</span>
       </movable>
     </div>
 
-    <!-- -------------------------------------------------------------- -->
-    <!-- -------------------------------------------------------------- -->
-
     <div class="controlls">
       
       <div class="element-options" :key="el.id" v-for="el in elements">
-        <div class="mText">
-          <input v-model="el.mText">
+        <div class="mText text-black">
+          <input v-model="el.mText" class="rounded-md">
         </div>
-        <div>
-          <label for="select-mFont"></label>
-          <select v-model="el.mFont" id="select-mFont">
+        <div class="pt-3">
+          <label for="select-mFont">Font:</label>
+          <select v-model="el.mFont" id="select-mFont" class="text-black float-right mr-2 rounded-md">
             <option>Roboto</option>
             <option>Monospace</option>
             <option>Lobster</option>
             <option>Cursive</option>
           </select>
         </div>
-        <div class="mColor">
-          <label for="select-mColor">Text color: </label>
-          <select id="select-mColor" v-model="el.mColor">
-            <option :key="index" v-for="(color, index) in Object.keys(colors)">{{ color }}</option>
+        <div class="mColor mt-1">
+          <label for="select-mColor">Color: </label>
+          <select id="select-mColor" v-model="el.mColor" class="text-black float-right mr-2 rounded-md">
+            <option :key="index" v-for="(color, index) in colors">{{ color.text }}</option>
           </select>
-          <div :key="index" v-for="(type, index) in aveilableColorTypes(el.mColor)">
-            <input type="checkbox" :true-value="type" v-model="el.mColorType">
-            <span>{{ type }}</span>
+          <div :key="index" v-for="(type, index) in aveilableColorTypes(el.mColor)" class="ml-4">
+            <input type="checkbox" :true-value="type" v-model="el.mColorType" class="">
+            <span class="ml-2">{{ type }}</span>
+            <br>
           </div>
         </div>
-        <div class="mSize">
-          <label for="select-mSize">Font size: {{ el.mSize }}</label>
-          <button @click="el.mSize += 2">Increment</button>
-          <button @click="el.mSize -= 2">Decrement</button>
+        <div class="mSize mt-1">
+          <label for="select-mSize">Size:</label>
+          <input type="range" min="100" max="400" v-model="el.mSize" class="float-right">
         </div>
-        <div class="mWeight">
-          <label for="select-mWeight">Font weight: {{ mWeight(el.rangeWeight) }}</label>
-          <input id="select-mWeight" type="range" v-model="el.rangeWeight">
+        <div class="mWeight mt-1">
+          <label for="select-mWeight">Font weight:</label>
+          <input id="select-mWeight" type="range" min="100" max="900" v-model="el.rangeWeight" class="float-right">
         </div>
-        <div class="mRotate">
-          <label for="select-mWeight">Rotation: {{ mRotate(el.rangeRotate) }}</label>
-          <br>
-          <input id="select-mWeight" type="range" v-model="el.rangeRotate">
+        <div class="mRotate mt-1">
+          <label for="select-mRotate">Rotation: {{ el.rangeRotate }}</label>
+          <input id="select-mRotate" type="range" min="0" max="360" v-model="el.rangeRotate" class="float-right">
         </div>
-        <div class="mPosition">
-          <button @click="el.mLeft = 350">Center</button>
-          <p>X = {{ el.mLeft }}</p>
-          <p>Y = {{ el.mTop }}</p>
+        <div class="mPosition mt-3">
+          <button @click="el.mLeft = 400" class="bg-gray-500 p-1 px-3 rounded-md hover:bg-gray-600">Center element</button>
+          <button @click="removeElement(el)" class="bg-red-700 p-1 px-3 rounded-md float-right hover:bg-red-800">Remove</button>
+          <!-- <p>X = {{ el.mLeft }}</p> -->
+          <!-- <p>Y = {{ el.mTop }}</p> -->
         </div>
-        <button @click="removeElement(el)">Remove</button>
       </div>
 
       <div class="commands">
         <button @click="addElement">Add New Element</button>
-        <!-- <button @click="generateOutput">Generate Output</button> -->
-        <button @click="processInput">Take input</button>
-        <input v-model="input">
         <br>
-        <textarea v-model="output"></textarea>
+        <input v-model="input" class="text-black">
+        <button @click="processInput">Process input</button>
+        <br>
+        <textarea v-model="output" class="text-black h-40 resize-none mt-3"></textarea>
       </div>
       
       <!-- <div>
@@ -94,14 +90,11 @@
 </template>
 
 <script>
+// import { filter } from 'vue/types/umd'
 // import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
-  components: {
-    // HelloWorld
-  },
-
   data() {
     return {
       idOf: 0,
@@ -112,22 +105,47 @@ export default {
           id: 0,
           mText: "Hello World",
           mFont: "Roboto",
-          mColor: "melns",
+          mColor: "",
           mColorType: "",
-          mSize: 32,
-          rangeWeight: 40,
+          mSize: 144,
+          rangeWeight: 400,
           rangeRotate: 0,
-          mLeft: 350,
+          mLeft: 400,
           mTop: 150,
         },
       ],
-      colors: {
-        balts: ['gluds', 'samts'],
-        melns: ['gluds', 'samts'],
-        sarkans: ['gluds', 'samts'],
-        sudrabs: ['gluds', 'gliters', 'spogulis'],
-        atstarojošs: []
-      }
+      colors: [
+        {
+          text: "Pelēks",
+          value: "#808080",
+          options: ['samts'],
+        },
+        {
+          text: "Dzeltens",
+          value: "#ffff00",
+          options: ['gluds', 'samts'],
+        },
+        {
+          text: "Zils",
+          value: "#00f",
+          options: ['gluds', 'samts'],
+        },
+        {
+          text: "Sudrabs",
+          value: "#ffffff",
+          options: ['gluds', 'gliters', 'spogulis', 'čūskāda', 'pērļu'],
+        },
+        {
+          text: "Sarkans",
+          value: "#ff0000",
+          options: ['gluds', 'samts', 'pērļu'],
+        },
+        {
+          text: "Karbons",
+          value: "#444",
+          options: [],
+        },
+      ]
     }
   },
 
@@ -141,18 +159,13 @@ export default {
   },
   
   methods: { 
-    // con() {
-    //   console.log("detected")
-    // },
-    mWeight(i) {
-      return i * 8 + 100
+    findColor(name) {
+      const obj = this.colors.find(color => color.text === name)
+      return obj ? obj.value : "#000"
     },
-    mRotate(i) {
-      var r = i * 3.6
-      return Math.round(r)
-    },
-    aveilableColorTypes(color) {
-      return this.colors[color]
+    aveilableColorTypes(name) {
+      const obj = this.colors.find(color => color.text === name)
+      return obj ? obj.options : null
     },
     addElement() {
       const newElement = {
@@ -161,10 +174,10 @@ export default {
         mFont: "Roboto",
         mColor: "melns",
         mColorType: "",
-        mSize: 32,
-        rangeWeight: 40,
+        mSize: 144,
+        rangeWeight: 400,
         rangeRotate: 0,
-        mLeft: 350,
+        mLeft: 400,
         mTop: 150,
       }
       this.elements = [...this.elements, newElement];
@@ -193,7 +206,6 @@ export default {
 </script>
 
 <style>
-
 * {
   margin: 0px;
   padding: 0px;
@@ -207,20 +219,24 @@ export default {
   background: #222;
   color: white;
   height: 100vh;
+  /* display: grid; */
+  /* grid-template-columns: 1fr 1fr; */
 }
 
 .view {
   position: relative;
   background: #eee;
-  width: 700px;
+  width: 800px;
   max-width: 100vw;
-  height: 700px;
+  height: 533px;
   left: 50%;
   transform: translateX(-50%);
+  overflow: hidden
 }
 
 .message {
   /* transform: translateX(-50%) !important; */
+  margin-right: -48rem;
   color: #000;
 }
 
@@ -229,14 +245,14 @@ export default {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 1rem;
-  width: 668px;
+  width: 800px;
   left: 50%;
   transform: translateX(-50%);
   padding: 1rem;
   background: #333;
 }
 
-.element-options {
+.element-options, .commands {
   background: #222;
   padding: 1rem 1.5rem;
   border-radius: 8px;
@@ -246,7 +262,6 @@ export default {
   width: 100%;
   padding: .25rem .5rem;
   transform: translateX(-0.5rem);
-  border-radius: 6px;
   border: none;
 }
 
@@ -256,8 +271,6 @@ export default {
   transform: translateX(-0.5rem);
   border-radius: 6px;
   border: none;
-
-
 }
 
 textarea {
@@ -266,12 +279,6 @@ textarea {
   resize: vertical;
 }
 
-.commands {
-
-}
-/*  */
-/* Use tailwind */
-/*  */
 </style>
 
 

@@ -1,6 +1,7 @@
 import Vue from "vue";
 import App from "./App.vue";
 import movable from "v-movable"
+import "tailwindcss/tailwind.css"
 
 Vue.config.productionTip = false;
 Vue.use(movable);
